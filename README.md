@@ -1,50 +1,49 @@
-# Welcome to your Expo app 👋
+# Flui
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicativo mobile desenvolvido para a etapa 2 do Challenge, com foco em facilitar a localização de pontos de recarga para veículos elétricos.
 
-## Get started
+## Sobre o projeto
 
-1. Install dependencies
+O Flui permite visualizar estações de recarga em um mapa interativo, pesquisar pontos próximos, aplicar filtros e consultar informações detalhadas sobre cada estação.
 
-   ```bash
-   npm install
-   ```
+Os dados utilizados nesta etapa são simulados e representam pontos de recarga localizados em Porto Alegre.
 
-2. Start the app
+## Funcionalidades
 
-   ```bash
-   npx expo start
-   ```
+- Mapa interativo com Google Maps
+- Marcadores personalizados de pontos de recarga
+- Busca por nome e endereço
+- Filtro por tipo de conector
+- Filtro por potência
+- Filtro por comodidades
+- Filtro por funcionamento 24 horas
+- Visualização detalhada dos pontos
+- Informações de disponibilidade
+- Horário de funcionamento
+- Períodos de menor movimento
+- Comodidades próximas
+- Feedback visual de filtros
+- Motion design e animações
+- Recursos de acessibilidade
 
-In the output, you'll find options to open the app in a
+## Tecnologias utilizadas
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- React Native
+- Expo
+- Expo Router
+- TypeScript
+- React Native Maps
+- Ionicons
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Estrutura principal
 
-## Get a fresh project
+```text
+app/
+├── (tabs)/
+│   └── index.tsx
+├── station/
+│   └── [id].tsx
+└── _layout.tsx
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+data/
+└── stations.ts
