@@ -1,16 +1,25 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     View,
     Text,
     StyleSheet,
     ScrollView,
     TouchableOpacity,
-    Animated
+    Animated,
+    
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 import { stations } from "../../data/stations";
+
+import {
+  isFavorite,
+  toggleFavorite,
+  getRating,
+  saveRating,
+  addToHistory,
+} from "../../services/storage";
 
 export default function StationDetailsScreen() {
 const router = useRouter();
@@ -18,6 +27,10 @@ const { id } = useLocalSearchParams();
 
 const contentAnim = useRef(new Animated.Value(30)).current;
 const opacityAnim = useRef(new Animated.Value(0)).current;
+
+const [favorite, setFavorite] = useState(false);
+const [rating, setRating] = useState(0);
+const [showRating, setShowRating] = useState(false);
 
 useEffect(() => {
     Animated.parallel([
@@ -39,6 +52,44 @@ useEffect(() => {
 const stationId = Number(id);
 
 const station = stations.find((item) => item.id === stationId);
+
+useEffect(() => {
+  async function loadFavorite() {
+    const savedFavorite =
+      await isFavorite(stationId);
+
+    setFavorite(savedFavorite);
+  }
+
+  loadFavorite();
+}, [stationId]);
+
+const handleFavorite = async () => {
+  const newFavoriteState =
+    await toggleFavorite(stationId);
+
+  setFavorite(newFavoriteState);
+};
+
+const handleRating = async (value: number) => {
+  setRating(value);
+  await saveRating(stationId, value);
+};
+
+useEffect(() => {
+  async function loadRating() {
+    const savedRating = await getRating(stationId);
+    setRating(savedRating);
+  }
+
+  loadRating();
+}, [stationId]);
+
+useEffect(() => {
+  if (!Number.isNaN(stationId)) {
+    addToHistory(stationId);
+  }
+}, [stationId]);
 
 if (!station) {
     return (
@@ -133,49 +184,110 @@ return (
         </Text>
 
         <View style={styles.quickActions}>
-        <TouchableOpacity style={styles.actionButton}
-        accessibilityRole="button"
-        accessibilityLabel="Traçar rota">    
-            <Ionicons
-            name="navigate-outline"
-            size={31}
-            color="#0D1010"
-            />
-            
-        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}
-        accessibilityRole="button"
-        accessibilityLabel="Avaliações do ponto">
-            <Ionicons
-            name="star-outline"
-            size={31}
-            color="#0D1010"
-            />
-        </TouchableOpacity>
+  {/* ROTA */}
+  <TouchableOpacity
+    style={styles.actionButton}
+    accessibilityRole="button"
+    accessibilityLabel="Traçar rota"
+  >
+    <Ionicons
+      name="navigate-outline"
+      size={31}
+      color="#0D1010"
+    />
+  </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}
-        accessibilityRole="button"
-        accessibilityLabel="Informações de carreamento"
+  {/* AVALIAÇÃO */}
+  <TouchableOpacity
+    style={styles.actionButton}
+    onPress={() => setShowRating(!showRating)}
+    accessibilityRole="button"
+    accessibilityLabel="Avaliar ponto de recarga"
+  >
+    <Ionicons
+      name={rating > 0 ? "star" : "star-outline"}
+      size={34}
+      color="#0D1010"
+    />
+  </TouchableOpacity>
+
+  {/* CARREGAMENTO */}
+  <TouchableOpacity
+    style={styles.actionButton}
+    accessibilityRole="button"
+    accessibilityLabel="Informações de carregamento"
+  >
+    <Ionicons
+      name="flash-outline"
+      size={31}
+      color="#0D1010"
+    />
+  </TouchableOpacity>
+
+  {/* FAVORITO */}
+  <TouchableOpacity
+    style={styles.actionButton}
+    onPress={handleFavorite}
+    accessibilityRole="button"
+    accessibilityLabel={
+      favorite
+        ? "Remover dos favoritos"
+        : "Adicionar aos favoritos"
+    }
+    accessibilityState={{
+      selected: favorite,
+    }}
+  >
+    <Ionicons
+      name={favorite ? "heart" : "heart-outline"}
+      size={34}
+      color="#0D1010"
+    />
+  </TouchableOpacity>
+
+</View>
+
+{/* ÁREA DE AVALIAÇÃO */}
+{showRating && (
+  <View style={styles.ratingContainer}>
+
+    <Text style={styles.ratingTitle}>
+      Avalie este ponto
+    </Text>
+
+    <View style={styles.ratingStars}>
+      {[1, 2, 3, 4, 5].map((value) => (
+        <TouchableOpacity
+          key={value}
+          onPress={() => handleRating(value)}
+          accessibilityRole="button"
+          accessibilityLabel={`${value} estrelas`}
+          accessibilityState={{
+            selected: rating === value,
+          }}
         >
-            <Ionicons
-            name="flash-outline"
-            size={31}
+          <Ionicons
+            name={
+              value <= rating
+                ? "star"
+                : "star-outline"
+            }
+            size={36}
             color="#0D1010"
-            />
+          />
         </TouchableOpacity>
+      ))}
+    </View>
 
-        <TouchableOpacity style={styles.actionButton}
-        accessibilityRole="button"
-        accessibilityLabel="Favoritar ponto"
-        >
-            <Ionicons
-            name="heart-outline"
-            size={31}
-            color="#0D1010"
-            />
-        </TouchableOpacity>
-        </View>
+    {rating > 0 && (
+      <Text style={styles.ratingText}>
+        Sua avaliação: {rating} de 5
+      </Text>
+    )}
+
+  </View>
+)}
 
         <Text style={styles.description}>
         {station.description}
@@ -498,4 +610,32 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "600",
   },
+
+  ratingContainer: {
+  backgroundColor: "#82F1D8",
+  borderRadius: 20,
+  padding: 16,
+  marginTop: 12,
+  marginBottom: 14,
+},
+
+ratingTitle: {
+  color: "#0D1010",
+  fontSize: 17,
+  fontWeight: "600",
+  marginBottom: 10,
+},
+
+ratingStars: {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 8,
+},
+
+ratingText: {
+  color: "#0D1010",
+  fontSize: 14,
+  fontWeight: "600",
+  marginTop: 10,
+},
 });

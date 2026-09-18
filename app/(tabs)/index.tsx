@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Modal,
   Switch,
+  ScrollView,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
@@ -241,7 +242,10 @@ export default function HomeScreen() {
   </Text>
 </View>
 
-      <View style={styles.stationList}>
+      <ScrollView
+  style={styles.stationList}
+  showsVerticalScrollIndicator={false}
+>
         {filteredStations.length === 0 && (
   <View style={styles.emptyState}>
     <Ionicons
@@ -294,7 +298,7 @@ export default function HomeScreen() {
             </View>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
 
       <View style={styles.bottomBar}>
         <TouchableOpacity
@@ -313,10 +317,12 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={styles.bottomButton}
+          onPress={() => router.push("/activity")}
           accessibilityLabel="Perfil"
         >
           <Ionicons name="person-outline" size={32} color="#82F1D8" />
         </TouchableOpacity>
+      </View>
         <Modal
           visible={showFilters}
           animationType="slide"
@@ -497,7 +503,8 @@ export default function HomeScreen() {
             </View>
           </View>
         </Modal>
-      </View>
+
+      
     </SafeAreaView>
   );
 }
@@ -531,7 +538,7 @@ const styles = StyleSheet.create({
   },
 
   mapContainer: {
-  height: "47%",
+  height: "40%",
   width: "100%",
   position: "relative",
 },
@@ -774,7 +781,8 @@ loadingText: {
   },
 
   stationList: {
-    backgroundColor: "#B7F4F4",
+    flex: 1,
+    backgroundColor: "#B7F4F4", 
   },
 
   stationCard: {
@@ -813,19 +821,21 @@ loadingText: {
     fontWeight: "600",
   },
 
-  bottomBar: {
-    flex: 1,
-    minHeight: 72,
-    backgroundColor: "#0D1010",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
+bottomBar: {
+  height: 82,
+  flexShrink: 0,
+  backgroundColor: "#0D1010",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-around",
+  paddingHorizontal: 24,
+},  
 
   bottomButton: {
-    width: 70,
-    height: 55,
-    justifyContent: "center",
+    width: 60,
+    height: 60,
     alignItems: "center",
+    justifyContent: "center",
   },
+
 });
